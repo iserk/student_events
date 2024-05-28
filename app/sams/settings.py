@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'sams.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if os.getenv('DATABASE', 'sqlite') == 'postgres':
+if os.getenv('DATABASE_ENGINE', 'sqlite') == 'postgres':
     db_settings = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('POSTGRES_DB_NAME', 'postgres'),
@@ -112,6 +112,48 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+#
+# Redis env vars to be used below
+#
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
+
+#
+# Caching
+#
+if os.getenv('CACHE_ENGINE') == 'redis':
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}',
+            'OPTIONS': {
+                'PARSER_CLASS': 'redis.connection.HiredisParser'
+            },
+        }
+    }
+
+
+
+#
+# Session
+#
+SESSION_ENGINE = 'redis_sessions.session'
+# SESSION_COOKIE_AGE = 7776000    # 3 months
+
+
+if os.getenv('SESSION_ENGINE') == 'redis':
+    SESSION_REDIS = {
+        'host': REDIS_HOST,
+        # 'unix_domain_socket_path': '/var/run/redis/redis.sock',
+        'port': REDIS_PORT,
+        'db': 0,
+        'password': '',
+        'prefix': 'session',
+        'socket_timeout': 1,
+        'retry_on_timeout': False
+    }
 
 
 # Internationalization
