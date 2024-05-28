@@ -75,8 +75,8 @@ WSGI_APPLICATION = 'sams.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
+if os.getenv('DATABASE', 'sqlite') == 'postgres':
+    db_settings = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('POSTGRES_DB_NAME', 'postgres'),
         'USER': os.getenv('POSTGRES_USER', 'postgres'),
@@ -84,6 +84,14 @@ DATABASES = {
         'HOST': os.getenv('POSTGRES_HOST', 'postgres'),
         'PORT': os.getenv('POSTGRES_PORT', '5432')
     }
+else:
+    db_settings = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+
+DATABASES = {
+    'default': db_settings
 }
 
 
