@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -114,9 +115,9 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-#
+
 # Redis env vars to be used below
-#
+
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 
@@ -134,16 +135,20 @@ if os.getenv('CACHE_ENGINE') == 'redis':
         }
     }
 
+# print('#CACHES', CACHES)
+
 
 
 #
 # Session
 #
-SESSION_ENGINE = 'redis_sessions.session'
+
 # SESSION_COOKIE_AGE = 7776000    # 3 months
 
-
 if os.getenv('SESSION_ENGINE') == 'redis':
+
+    SESSION_ENGINE = 'redis_sessions.session'
+
     SESSION_REDIS = {
         'host': REDIS_HOST,
         # 'unix_domain_socket_path': '/var/run/redis/redis.sock',
