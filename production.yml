@@ -1,47 +1,50 @@
-version: '3'
-
 services:
   app:
-    restart: always
-    build: ./app
+    restart: unless-stopped
+    build:
+      context: ./app
+      target: prod
+    env_file: .env
     expose:
       - "8000"
+    depends_on:
+      - postgres
+      - redis
     links:
       - postgres:postgres
       - redis:redis
     volumes:
-      - app-static:/usr/src/app/static
-    env_file: .env
-    command: /usr/local/bin/gunicorn sams.wsgi:application -w 2 -b :8000
+      - app-static:/app/static
 
   nginx:
-    restart: always
+    restart: unless-stopped
     image: nginx:latest
     ports:
       - "80:80"
     volumes:
       - "./nginx/default.conf:/etc/nginx/conf.d/default.conf"
-      - app-static:/www/static
+      - app-static:/app/static
     links:
       - app:app
 
   postgres:
-    restart: always
+    restart: unless-stopped
     image: postgres:latest
+    env_file: .env
     ports:
       - "5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data/
+      - pg-data:/var/lib/postgresql/data/
 
   redis:
-    restart: always
+    restart: unless-stopped
     image: redis:latest
     ports:
       - "6379"
     volumes:
-      - redisdata:/data
+      - redis-data:/data
 
 volumes:
   app-static:
-  pgdata:
-  redisdata:
+  pg-data:
+  redis-data:
