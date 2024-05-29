@@ -1,0 +1,32 @@
+body {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 10px;
+}
+
+.card {
+    margin: 10px 0;
+}
+
+.page_header a,
+.page_header a:link,
+.page_header a:hover,
+.page_header a:active,
+.page_header a:visited {
+    color: #0B58CA;
+    text-decoration: none;
+}
+
+.page_header a:hover {
+    color: #107AFF;
+    /*text-decoration: underline;*/
+}
+
+.page_header a:active {
+    color: #CA580B;
+}
+
+
+.page_header .delimiter {
+    color: #888;
+}
