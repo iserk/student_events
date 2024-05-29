@@ -11,7 +11,7 @@
     </p>
     <p><strong>Starts:</strong> {{ course.start_date }}</p>
     <p><strong>Ends:</strong> {{ course.end_date }}</p>
-    <p><strong>Max Seats:</strong> {{ course.max_seats }}</p>
+    <p><strong>Seats Available:</strong> {{ course.seats_available }} of {{ course.max_seats }}</p>
 
 
     <a href="{% url 'course_list' %}">Back to the list</a>

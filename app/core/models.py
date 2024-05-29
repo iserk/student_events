@@ -22,13 +22,17 @@ class Course(models.Model):
     is_public = models.BooleanField(default=False)
     is_active = models.BooleanField(default=False)
 
+    def seats_available(self):
+        if self.max_seats:
+            return self.max_seats - self.registrations.count()
+        return None
     def __str__(self):
         return self.title
 
 
 class CourseRegistration(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='course_registrations', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='registrations', on_delete=models.CASCADE)
     registration_date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
