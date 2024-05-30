@@ -24,11 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jq4gp97v4&)%n)u4#zaa&6ln@$((wjv&f+84u^en6$n7nds5pg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [*map(str.strip, os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(','))]
 
-
+CSRF_TRUSTED_ORIGINS = [*map(str.strip, os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', '').split(','))]
+if CSRF_TRUSTED_ORIGINS == ['']:
+    CSRF_TRUSTED_ORIGINS = []
 
 # Application definition
 

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Request Info</title>
+    <style>
+        body {
+            font: 10pt Verdana, Tahoma, Helvetica, Arial, sans-serif;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 0.5em;
+        }
+        th {
+            text-align: left;
+            vertical-align: top;
+        }
+        tr { background: #fff; }
+        tr:nth-child(odd) { background: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>Request Info</h1>
+    <table>
+        <thead>
+            <tr><th>Attribute</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+            <!-- List of fields to display: scheme body path path_info method encoding content_type content_params GET POST FILES COOKIES META headers resolver_match current_app urlconf session site user get_host get_port get_full_path get_full_path_info build_absolute_uri -->
+            <tr><th>scheme</th><td>{{ request.scheme }}</td></tr>
+            <tr><th>body</th><td>{{ request.body }}</td></tr>
+            <tr><th>path</th><td>{{ request.path }}</td></tr>
+            <tr><th>path_info</th><td>{{ request.path_info }}</td></tr>
+            <tr><th>method</th><td>{{ request.method }}</td></tr>
+            <tr><th>encoding</th><td>{{ request.encoding }}</td></tr>
+            <tr><th>content_type</th><td>{{ request.content_type }}</td></tr>
+            <tr><th>content_params</th><td>{{ request.content_params }}</td></tr>
+            <tr><th>GET</th><td>{{ request.GET }}</td></tr>
+            <tr><th>POST</th><td>{{ request.POST }}</td></tr>
+            <tr><th>FILES</th><td>{{ request.FILES }}</td></tr>
+            <tr><th>COOKIES</th><td>
+                <table>
+                {% for key, value in request.COOKIES.items %}
+                    <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+                {% endfor %}
+                </table></td></tr>            <tr><th>META</th><td>
+                <table>
+                {% for key, value in request.META.items %}
+                    <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+                {% endfor %}
+                </table></td></tr>
+            <tr><th>headers</th><td>
+                <table>
+                {% for key, value in request.headers.items %}
+                    <tr><th>{{ key }}</th><td>{{ value }}</td></tr>
+                {% endfor %}
+                </table></td></tr>            <tr><th>resolver_match</th><td>{{ request.resolver_match }}</td></tr>
+            <tr><th>current_app</th><td>{{ request.current_app }}</td></tr>
+            <tr><th>urlconf</th><td>{{ request.urlconf }}</td></tr>
+            <tr><th>session</th><td>{{ request.session }}</td></tr>
+            <tr><th>site</th><td>{{ request.site }}</td></tr>
+            <tr><th>user</th><td>{{ request.user }}</td></tr>
+            <tr><th>get_host()</th><td>{{ request.get_host }}</td></tr>
+            <tr><th>get_port()</th><td>{{ request.get_port }}</td></tr>
+            <tr><th>get_full_path()</th><td>{{ request.get_full_path }}</td></tr>
+            <tr><th>get_full_path_info()</th><td>{{ request.get_full_path_info }}</td></tr>
+            <tr><th>build_absolute_uri()</th><td>{{ request.build_absolute_uri }}</td></tr>
+        </tbody>
+    </table>
+</body>
+</html>

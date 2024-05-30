@@ -7,6 +7,9 @@ from django.contrib import messages
 from . import models
 
 
+def request_info(request):
+    return render(request, 'core/request_info.html', dict(request=request))
+
 def home(request):
     # if not request.user.is_authenticated:
     #     return redirect('login')
