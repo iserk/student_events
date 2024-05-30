@@ -20,18 +20,18 @@
     {% block main_menu %}
         {% include 'core/_main_menu.html' %}
     {% endblock %}
-    
+
     <h1 class="page_header">{% block header %}{% endblock %}</h1>
-    
+
     {% block messages %}
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}error{% else %}primary{% endif %}" role="alert">
+            <div class="alert alert-primary" role="alert">
                 {{ message }}</div>
         {% endfor %}
-    {% endif %}        
+    {% endif %}
     {% endblock %}
-    
+
     <p>{% block content %}{% endblock %}</p>
 {% endblock %}
 </body>

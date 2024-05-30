@@ -27,7 +27,42 @@ def show_course_list(request):
 
 def show_course_detail(request, course_id):
     course = get_object_or_404(models.Course, id=course_id)
-    return render(request, 'core/course_detail.html', dict(course=course, section='courses'))
+    return render(request, 'core/course_detail.html',
+                  dict(
+                      course=course,
+                      section='courses',
+                      is_enrolled=request.user.is_authenticated and request.user.course_registrations.filter(course=course).exists(),
+                      can_enroll=request.user.is_authenticated and not request.user.course_registrations.filter(course=course).exists() and course.seats_available() > 0
+                  ))
+
+def course_enroll(request, course_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    course = get_object_or_404(models.Course, id=course_id)
+    registration, created = models.CourseRegistration.objects.get_or_create(user=request.user, course=course)
+    if created:
+        messages.success(request, f'You have successfully enrolled in the course "{course.title}".')
+    else:
+        messages.error(request, f'You are already enrolled in the course "{course.title}".')
+    return redirect('course_detail', course_id=course_id)
+
+
+def course_unenroll(request, course_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    course = get_object_or_404(models.Course, id=course_id)
+    registration = get_object_or_404(models.CourseRegistration, user=request.user, course=course)
+    registration.delete()
+    messages.success(request, f'You have successfully unenrolled from the course "{course.title}".')
+    return redirect('course_detail', course_id=course_id)
 
 
 def user_login(request):

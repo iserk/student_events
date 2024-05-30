@@ -2,16 +2,36 @@
 {% block title %}{{ course.title }}{% endblock %}
 
 {% block header %}
-    Student Portal
+    {% if request.user.is_authenticated %}
+        Welcome, {{ request.user.username }}!
+    {% else %}
+        Welcome!
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    <p>You are logged in as
-        <a href="{% url 'profile' %}">{{ request.user.username }}</a></p>
-{#    <p><a href="{% url 'logout' %}">Logout</a></p>#}
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button class="btn btn-primary" type="submit">logout</button>
-    </form>
+    {% if request.user.is_authenticated %}
+
+        {% if request.user.course_registrations.count == 0 %}
+            <p>You are not enrolled in any courses yet.</p>
+            <p>Please proceed to the <a href="{% url 'course_list' %}">Courses</a> page to enroll in a course.</p>
+        {% else %}
+            <p>Here are the courses you are enrolled in:</p>
+            <ul>
+                {% for registration in request.user.course_registrations.all %}
+                    <li><a href="{% url 'course_detail' registration.course.id %}">{{ registration.course.title }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">logout</button>
+        </form>
+
+    {% else %}
+        <p>You are not logged in. <a href="{% url 'login' %}">Login</a> to see your courses.</p>
+        <p>Alternatively, you can browse the <a href="{% url 'course_list' %}">available courses</a>.</p>
+    {% endif %}
 {% endblock %}
 

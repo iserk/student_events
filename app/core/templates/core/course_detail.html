@@ -13,6 +13,24 @@
     <p><strong>Ends:</strong> {{ course.end_date }}</p>
     <p><strong>Seats Available:</strong> {{ course.seats_available }} of {{ course.max_seats }}</p>
 
+    {% if request.user.is_authenticated %}
+        {% if can_enroll %}
+            <form method="post" action="{% url 'course_enroll' course.id %}">
+                {% csrf_token %}
+                <button class="btn btn-primary" type="submit">Enroll</button>
+            </form>
+        {% elif is_enrolled %}
+            <p>You are already enrolled in this course.</p>
+            <form method="post" action="{% url 'course_unenroll' course.id %}">
+                {% csrf_token %}
+                <button class="btn btn-danger" type="submit">Unenroll</button>
+            </form>
+        {% else %}
+            <p>There are no seats available in this course.</p>
+        {% endif %}
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to enroll in this course.</p>
+    {% endif %}
 
     <a href="{% url 'course_list' %}">Back to the list</a>
 
