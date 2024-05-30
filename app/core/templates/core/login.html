@@ -1,0 +1,22 @@
+{% extends 'core/_base.html' %}
+{%  block header %}
+    Login
+{% endblock %}
+
+{% block content %}
+    <form method="POST" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+
+{#    {% if messages %}#}
+{#        <ul>#}
+{#            {% for message in messages %}#}
+{#                <li>{{ message }}</li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    {% endif %}#}
+
+{#    <p>Don't have an account? <a href="{% url 'signup' %}">Register</a></p>#}
+{% endblock %}

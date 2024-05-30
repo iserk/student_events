@@ -1,0 +1,33 @@
+{% extends "core/_base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block header %}My Profile{% endblock %}
+
+{% block content %}
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th scope="row">First name</th>
+      <td>{{ request.user.first_name }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Last name</th>
+      <td>request.user.last_name</td>
+    </tr>
+    <tr>
+      <th scope="row">E-mail</th>
+      <td>{{ request.user.email }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Username</th>
+      <td>{{ request.user.username }}</td>
+    </tr>
+    <tr>
+        <th scope="row">Date joined</th>
+        <td>{{ request.user.date_joined }}</td>
+    </tr>
+  </tbody>
+</table>
+
+{% endblock %}
