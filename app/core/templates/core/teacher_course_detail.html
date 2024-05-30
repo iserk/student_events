@@ -1,0 +1,83 @@
+{% extends "core/_base.html" %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block header %}
+    <a href="{% url 'course_list' %}">Courses</a> <span class="delimiter">/</span> {{ course.title }}
+{% endblock %}
+{% block content %}
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Title</th>
+      <td>{{ course.title }}</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td>{{ course.description }}</td>
+    </tr>
+    <tr>
+      <th>Organiser</th>
+      <td>{{ course.owner.first_name }} {{ course.owner.last_name }}
+            &lt;<a href="mailto:{{ course.owner.email }}">{{ course.owner.email }}</a>&gt;</td>
+    </tr>
+    <tr>
+      <th>Starts</th>
+      <td>{{ course.start_date }}</td>
+    </tr>
+    <tr>
+      <th>Ends</th>
+      <td>{{ course.end_date }}</td>
+    </tr>
+    <tr>
+        <th>Is Active</th>
+      <td>
+          <form method="post" action="{% url 'teacher_course_update' course.id %}">
+            {% csrf_token %}
+            {% if course.is_active %}
+                <span class="badge bg-success">Active</span>
+                <button class="btn btn-danger" name="active" value="0" type="submit">Deactivate</button>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+                <button class="btn btn-primary" name="active" value="1" type="submit">Activate</button>
+            {% endif %}
+          </form>
+      </td>
+    </tr>
+    <tr>
+      <th>Is Public</th>
+      <td>
+          <form method="post" action="{% url 'teacher_course_update' course.id %}">
+            {% csrf_token %}
+            {% if course.is_public %}
+                <span class="badge bg-success">Public</span>
+                <button class="btn btn-danger" name="public" value="0" type="submit">Unpublish</button>
+            {% else %}
+                <span class="badge bg-danger">Inactive</span>
+                <button class="btn btn-primary" name="public" value="1" type="submit">Publish</button>
+            {% endif %}
+          </form>
+      </td>
+    </tr>
+    <tr>
+        <th>Max Seats</th>
+      <td>{{ course.max_seats }}</td>
+    </tr>
+    <tr>
+      <th>Enrollments</th>
+      <td>
+          <strong>{{ course.registrations.count }}</strong> student(s) enrolled.
+            <ul>
+                {% for registration in course.registrations.all %}
+                    <li>{{ registration.user.first_name }} {{ registration.user.last_name }}
+                        {% if registration.user.email %}
+                        &lt;<a href="mailto:{{ registration.user.email }}">{{ registration.user.email }}</a>&gt;
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+{% endblock %}
+

@@ -6,10 +6,13 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+User.is_student = property(lambda self: self.groups.filter(name='Students').exists())
+User.is_teacher = property(lambda self: self.groups.filter(name='Teachers').exists())
+
 
 class Course(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    owner = models.ForeignKey(User, on_delete=models.PROTECT)
+    owner = models.ForeignKey(User, related_name='owned_courses', on_delete=models.PROTECT)
 
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)

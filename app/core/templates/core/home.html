@@ -12,21 +12,34 @@
 {% block content %}
     {% if request.user.is_authenticated %}
 
-        {% if request.user.course_registrations.count == 0 %}
-            <p>You are not enrolled in any courses yet.</p>
-            <p>Please proceed to the <a href="{% url 'course_list' %}">Courses</a> page to enroll in a course.</p>
-        {% else %}
-            <p>Here are the courses you are enrolled in:</p>
-            <ul>
-                {% for registration in request.user.course_registrations.all %}
-                    <li><a href="{% url 'course_detail' registration.course.id %}">{{ registration.course.title }}</a></li>
-                {% endfor %}
-            </ul>
+        {% if request.user.is_student %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Student</h5>
+                    <p class="card-text">You are in the Students group.</p>
+                    <a href="{% url 'student_home' %}" class="btn btn-primary">Proceed the Student Portal</a>
+                </div>
+            </div>
+        {% endif %}
+        {% if request.user.is_student %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Teacher</h5>
+                    <p class="card-text">You are in the Teachers group.</p>
+                    <a href="{% url 'teacher_home' %}" class="btn btn-primary">Proceed the Teachers Portal</a>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if not request.user.is_student and not request.user.is_teacher %}
+            <div class="alert alert-warning" role="alert">
+                You are not in any group. Please contact the administrator.
+            </div>
         {% endif %}
 
         <form method="post" action="{% url 'logout' %}">
             {% csrf_token %}
-            <button class="btn btn-primary" type="submit">logout</button>
+            <button class="btn btn-danger" type="submit">logout</button>
         </form>
 
     {% else %}

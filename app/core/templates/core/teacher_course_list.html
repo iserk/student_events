@@ -1,0 +1,59 @@
+{% extends "core/_base.html" %}
+{% block title %}Courses{% endblock %}
+{% block header %}Courses{% endblock %}
+{% block content %}
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Course</th>
+      <th scope="col">Starts</th>
+      <th scope="col">Ends</th>
+      <th scope="col">Enrollments</th>
+      <th scope="col">Max Seats</th>
+      <th scope="col">Is Active</th>
+      <th scope="col">Is Public</th>
+      <th scope="col">Manage</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in courses %}
+    <tr>
+      <th scope="row">{{ course.title }}</th>
+      <td>{{ course.start_date }}</td>
+      <td>{{ course.end_date }}</td>
+      <td>{{ course.registrations.count }}</td>
+      <td>{{ course.max_seats }}</td>
+      <td>
+        {% if course.is_active %}
+            <span class="badge bg-success">Active</span>
+        {% else %}
+            <span class="badge bg-danger">Inactive</span>
+        {% endif %}          
+      </td>
+      <td>
+        {% if course.is_public %}
+            <span class="badge bg-success">Published</span>
+        {% else %}
+            <span class="badge bg-danger">Unpublished</span>
+        {% endif %}          
+      </td>
+      <td>
+        <a href="{% url 'teacher_course_detail' course.id %}">Manage</a>
+      </tr>
+    {% endfor %}
+</table>
+
+
+    {% for course in courses %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a href="{% url 'course_detail' course.id %}">
+                        {{ course.title }}</a></h5>
+                <p class="card-text">{{ course.description }}</p>
+                <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">View</a>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

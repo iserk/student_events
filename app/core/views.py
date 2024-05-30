@@ -11,7 +11,24 @@ def home(request):
     # if not request.user.is_authenticated:
     #     return redirect('login')
     #
-    return render(request, 'core/home.html', dict(section='home'))
+    groups = request.user.groups.all()
+    is_teacher = groups.filter(name='Teachers').exists()
+    is_student = groups.filter(name='Students').exists()
+
+    if not is_teacher and is_student:
+        return redirect('student_home')
+    elif is_teacher and not is_student:
+        return redirect('teacher_home')
+    else:
+        return render(request, 'core/home.html', dict(section='home', portal='home'))
+
+
+def student_home(request):
+    return render(request, 'core/student_home.html', dict(section='home', portal='student'))
+
+
+def teacher_home(request):
+    return render(request, 'core/teacher_home.html', dict(section='home', portal='teacher'))
 
 
 def show_profile(request):
@@ -65,6 +82,21 @@ def course_unenroll(request, course_id):
     return redirect('course_detail', course_id=course_id)
 
 
+def teacher_course_list(request):
+    courses = models.Course.objects.filter(owner=request.user)
+    return render(request, 'core/teacher_course_list.html', dict(courses=courses, section='courses'))
+
+
+def teacher_course_detail(request, course_id):
+    course = get_object_or_404(models.Course, id=course_id)
+    return render(request, 'core/teacher_course_detail.html',
+                  dict(
+                      course=course,
+                      section='courses',
+                      is_enrolled=request.user.is_authenticated and request.user.course_registrations.filter(course=course).exists(),
+                      can_enroll=request.user.is_authenticated and not request.user.course_registrations.filter(course=course).exists() and course.seats_available() > 0
+                  ))
+
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -89,3 +121,32 @@ def user_logout(request):
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
     return redirect('login')
+
+
+def teacher_course_update(request, course_id):
+    if request.method != 'POST':
+        return HttpResponse(status=405)
+
+    if not request.user.is_authenticated:
+        messages.error(request, 'You must be logged in to update a course.')
+        return redirect('login')
+
+    course = get_object_or_404(models.Course, id=course_id)
+
+    if not request.user.is_teacher or request.user != course.owner:
+        messages.error(request, "You are not authorized to update this course.")
+        return redirect('teacher_home')
+
+    if request.POST.get('active'):
+        new_status = True if request.POST.get('active') == '1' else False
+        course.is_active = new_status
+        course.save()
+        messages.success(request, f'The course "{course.title}" active status has been changed to {new_status}')
+
+    if request.POST.get('public'):
+        new_status = True if request.POST.get('public') == '1' else False
+        course.is_public = new_status
+        course.save()
+        messages.success(request, f'The course "{course.title}" published status has been changed to {new_status}')
+
+    return redirect('teacher_course_detail', course_id=course_id)
