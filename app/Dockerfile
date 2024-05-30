@@ -5,6 +5,7 @@ FROM python:3.12 as base
 RUN apt update && apt install -y \
   python3-dev \
   libpq-dev  \
+  netcat-traditional \
   && rm -rf /var/lib/apt/lists/*
 
 # Set work directory
