@@ -11,6 +11,9 @@ fi
 echo "Applying database migrations"
 python manage.py migrate
 
+echo "Collecting static files"
+python manage.py collectstatic --noinput
+
 echo "Starting server"
 
 # Change the --forwarded-allow-ips parameter to the actual IP address of the reverse proxy server

@@ -38,7 +38,7 @@ ENTRYPOINT ["./docker-entrypoint-dev.sh"]
 ######## build ########
 FROM base AS build
 COPY ./ /app/
-RUN python manage.py collectstatic --noinput
+#RUN python manage.py collectstatic --noinput
 
 
 ######## prod ########
