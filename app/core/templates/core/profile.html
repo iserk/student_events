@@ -24,6 +24,34 @@
       <td>{{ request.user.username }}</td>
     </tr>
     <tr>
+        <th scope="row">Groups</th>
+        <td>
+            {% for group in request.user.groups.all %}
+                {%  if group.name == 'Teachers' %}
+                    <span class="badge bg-primary">
+                        {{ group.name }}
+                    </span>
+                {% elif group.name == 'Students' %}
+                    <span class="badge bg-success">
+                        {{ group.name }}
+                    </span>
+                {% endif %}
+            {% endfor %}
+
+            {% if request.user.is_staff %}
+                <span class="badge bg-info">
+                    Staff
+                </span>
+            {% endif %}
+
+            {% if request.user.is_superuser %}
+                <span class="badge bg-danger">
+                    Superuser
+                </span>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
         <th scope="row">Date joined</th>
         <td>{{ request.user.date_joined }}</td>
     </tr>

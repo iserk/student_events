@@ -1,15 +1,15 @@
 def add_portal_section(request):
-    portal = 'student' if request.path.startswith('/learn/') else 'teacher' if request.path.startswith('/teach/') else 'home'
 
     match request.path:
-        case p if p.startswith('/learn/courses/'):
+        case p if p.startswith('/courses/'):
             section = 'courses'
-        case p if p.startswith('/teach/courses/'):
-            section = 'manage_courses'
+        case p if p.startswith('/teacher/'):
+            section = 'teacher'
+        case p if p.startswith('/user/'):
+            section = 'user'
         case _:
             section = 'home'
 
     return dict(
-        portal=portal,
         section=section,
     )

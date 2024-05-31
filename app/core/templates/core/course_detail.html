@@ -1,4 +1,7 @@
 {% extends "core/_base.html" %}
+
+{% load enrollment %}
+
 {% block title %}{{ course.title }}{% endblock %}
 {% block header %}
     <a href="{% url 'course_list' %}">Courses</a> <span class="delimiter">/</span> {{ course.title }}
@@ -59,19 +62,23 @@
     </tbody>
   </table>
     {% if request.user.is_authenticated %}
-        {% if can_enroll %}
+        {% if user|can_enroll_to:course %}
             <form method="post" action="{% url 'course_enroll' course.id %}">
                 {% csrf_token %}
                 <button class="btn btn-primary" type="submit">Enroll</button>
             </form>
-        {% elif is_enrolled %}
-            <p>You are already enrolled in this course.</p>
+        {% elif user|is_enrolled_to:course %}
+            <p>You are enrolled in this course.</p>
             <form method="post" action="{% url 'course_unenroll' course.id %}">
                 {% csrf_token %}
                 <button class="btn btn-danger" type="submit">Unenroll</button>
             </form>
-        {% else %}
+        {% elif not course.is_active %}
+            <p>This course is not active.</p>
+        {% elif course.seats_available <= 0 %}
             <p>There are no seats available in this course.</p>
+        {% else %}
+            <p>You cannot enroll in this course at the moment.</p>
         {% endif %}
     {% else %}
         <p><a href="{% url 'login' %}">Login</a> to enroll in this course.</p>

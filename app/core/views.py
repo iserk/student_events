@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from django.db.models import Q
 
 from . import models
 
@@ -14,46 +15,36 @@ def home(request):
     # if not request.user.is_authenticated:
     #     return redirect('login')
     #
-    groups = request.user.groups.all()
-    is_teacher = groups.filter(name='Teachers').exists()
-    is_student = groups.filter(name='Students').exists()
-
-    if not is_teacher and is_student:
-        return redirect('student_home')
-    elif is_teacher and not is_student:
-        return redirect('teacher_home')
-    else:
-        return render(request, 'core/home.html', dict(section='home', portal='home'))
-
-
-def student_home(request):
-    return render(request, 'core/student_home.html', dict(section='home', portal='student'))
-
-
-def teacher_home(request):
-    return render(request, 'core/teacher_home.html', dict(section='home', portal='teacher'))
+    return render(request, 'core/home.html')
 
 
 def show_profile(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    return render(request, 'core/profile.html', dict(section='user'))
+    return render(request, 'core/profile.html')
+
 
 def show_course_list(request):
-    courses = models.Course.objects.filter(is_public=True)
-    return render(request, 'core/course_list.html', dict(courses=courses, section='courses'))
+    if request.user.is_authenticated:
+        enrolled_courses = Q(registrations__user=request.user)
+        public_courses = Q(is_public=True)
+
+        courses = models.Course.objects.filter(public_courses | enrolled_courses).distinct()
+    else:
+        courses = models.Course.objects.filter(is_public=True)
+
+    return render(request, 'core/course_list.html', dict(courses=courses))
 
 
 def show_course_detail(request, course_id):
     course = get_object_or_404(models.Course, id=course_id)
-    return render(request, 'core/course_detail.html',
-                  dict(
-                      course=course,
-                      section='courses',
-                      is_enrolled=request.user.is_authenticated and request.user.course_registrations.filter(course=course).exists(),
-                      can_enroll=request.user.is_authenticated and not request.user.course_registrations.filter(course=course).exists() and course.seats_available() > 0
-                  ))
+    return render(
+        request, 'core/course_detail.html',
+        dict(
+            course=course,
+        )
+    )
 
 def course_enroll(request, course_id):
     if not request.user.is_authenticated:
@@ -63,6 +54,11 @@ def course_enroll(request, course_id):
         return HttpResponse(status=405)
 
     course = get_object_or_404(models.Course, id=course_id)
+
+    if not course.is_active:
+        messages.error(request, f'The course "{course.title}" is not active.')
+        return redirect('course_detail', course_id=course_id)
+
     registration, created = models.CourseRegistration.objects.get_or_create(user=request.user, course=course)
     if created:
         messages.success(request, f'You have successfully enrolled in the course "{course.title}".')
@@ -85,21 +81,6 @@ def course_unenroll(request, course_id):
     return redirect('course_detail', course_id=course_id)
 
 
-def teacher_course_list(request):
-    courses = models.Course.objects.filter(owner=request.user)
-    return render(request, 'core/teacher_course_list.html', dict(courses=courses, section='courses'))
-
-
-def teacher_course_detail(request, course_id):
-    course = get_object_or_404(models.Course, id=course_id)
-    return render(request, 'core/teacher_course_detail.html',
-                  dict(
-                      course=course,
-                      section='courses',
-                      is_enrolled=request.user.is_authenticated and request.user.course_registrations.filter(course=course).exists(),
-                      can_enroll=request.user.is_authenticated and not request.user.course_registrations.filter(course=course).exists() and course.seats_available() > 0
-                  ))
-
 def user_login(request):
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
@@ -117,13 +98,47 @@ def user_login(request):
             messages.error(request, 'Invalid username or password.')
     else:
         form = AuthenticationForm()
-    return render(request, 'core/login.html', dict(form=form, section='user'))
+    return render(request, 'core/login.html', dict(form=form))
 
 
 def user_logout(request):
     logout(request)
     messages.success(request, 'You have been successfully logged out.')
     return redirect('login')
+
+
+
+def teacher_course_list(request):
+    courses = models.Course.objects.filter(owner=request.user)
+    return render(request, 'core/teacher_course_list.html', dict(courses=courses))
+
+
+def teacher_student_list(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if not request.user.is_teacher:
+        messages.error(request, 'You must be a teacher to view this page.')
+        return redirect('home')
+
+    students = models.User.objects.filter(groups__name='Students')
+    print(students)
+    return render(request, 'core/students_activity.html', dict(students=students))
+
+
+def teacher_course_detail(request, course_id):
+    course = get_object_or_404(models.Course, id=course_id)
+
+    if request.user != course.owner:
+        messages.error(request, 'You are not authorized to view this page.')
+        return redirect('home')
+
+    return render(
+        request, 'core/teacher_course_detail.html',
+        dict(
+            course=course,
+        )
+    )
 
 
 def teacher_course_update(request, course_id):
@@ -138,7 +153,7 @@ def teacher_course_update(request, course_id):
 
     if not request.user.is_teacher or request.user != course.owner:
         messages.error(request, "You are not authorized to update this course.")
-        return redirect('teacher_home')
+        return redirect('course_detail', course_id=course_id)
 
     if request.POST.get('active'):
         new_status = True if request.POST.get('active') == '1' else False

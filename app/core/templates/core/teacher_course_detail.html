@@ -1,7 +1,10 @@
 {% extends "core/_base.html" %}
+
+{% load enrollment %}
+
 {% block title %}{{ course.title }}{% endblock %}
 {% block header %}
-    <a href="{% url 'course_list' %}">Courses</a> <span class="delimiter">/</span> {{ course.title }}
+    <a href="{% url 'teacher_course_list' %}">Courses</a> <span class="delimiter">/</span> {{ course.title }}
 {% endblock %}
 {% block content %}
 
@@ -52,11 +55,25 @@
                 <span class="badge bg-success">Public</span>
                 <button class="btn btn-danger" name="public" value="0" type="submit">Unpublish</button>
             {% else %}
-                <span class="badge bg-danger">Inactive</span>
+                <span class="badge bg-danger">Private</span>
                 <button class="btn btn-primary" name="public" value="1" type="submit">Publish</button>
             {% endif %}
           </form>
       </td>
+    </tr>
+    <tr>
+        <th>
+            Shareable Link
+        </th>
+        <td>
+            {% full_url 'course_detail' course.id as course_full_url %}
+
+            <div style="padding: 8px 16px; border-radius: 4px; border: 1px solid #777; background: #eee; margin: 10px 0; ">
+                {{ course_full_url }}
+            </div>
+            <p>You can share the link with your students even if the course is not public.</p>
+
+        </td>
     </tr>
     <tr>
         <th>Max Seats</th>

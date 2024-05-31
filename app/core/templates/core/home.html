@@ -10,30 +10,50 @@
 {% endblock %}
 
 {% block content %}
+
     {% if request.user.is_authenticated %}
 
-        {% if request.user.is_student %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Student</h5>
-                    <p class="card-text">You are in the Students group.</p>
-                    <a href="{% url 'student_home' %}" class="btn btn-primary">Proceed the Student Portal</a>
+        {% if request.user.owned_courses.count > 0 or request.user.is_teacher %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Courses Authored</h3>
                 </div>
-            </div>
-        {% endif %}
-        {% if request.user.is_student %}
-            <div class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Teacher</h5>
-                    <p class="card-text">You are in the Teachers group.</p>
-                    <a href="{% url 'teacher_home' %}" class="btn btn-primary">Proceed the Teachers Portal</a>
+                    {% if request.user.owned_courses.count > 0 %}
+                        <p>Here are the courses you created:</p>
+                        <ul>
+                            {% for course in request.user.owned_courses.all %}
+                                <li><a href="{% url 'course_detail' course.id %}">{{ course.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>You haven't created any courses yet.</p>
+                        <p>Please proceed to the <a href="{% url 'course_list' %}">Courses</a> page to create a course.</p>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
 
-        {% if not request.user.is_student and not request.user.is_teacher %}
-            <div class="alert alert-warning" role="alert">
-                You are not in any group. Please contact the administrator.
+
+        {% if request.user.course_registrations.count > 0 or request.user.is_student %}
+            <div class="card">
+                <div class="card-header">
+                    <h3>Courses Enrolled</h3>
+                </div>
+                <div class="card-body">
+                    {% if request.user.course_registrations.count > 0 %}
+                        <p>Here are the courses you are enrolled in:</p>
+                        <ul>
+                            {% for registration in request.user.course_registrations.all %}
+                                <li><a href="{% url 'course_detail' registration.course.id %}">{{ registration.course.title }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>You are not enrolled in any courses yet.</p>
+                        <p>Please proceed to the <a href="{% url 'course_list' %}">Courses</a> page to enroll in a course.</p>
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
 
@@ -46,5 +66,6 @@
         <p>You are not logged in. <a href="{% url 'login' %}">Login</a> to see your courses.</p>
         <p>Alternatively, you can browse the <a href="{% url 'course_list' %}">available courses</a>.</p>
     {% endif %}
+
 {% endblock %}
 

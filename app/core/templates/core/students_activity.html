@@ -1,0 +1,23 @@
+{% extends "core/_base.html" %}
+{% block title %}Student Activity{% endblock %}
+{% block header %}Student Activity{% endblock %}
+{% block content %}
+    {% for student in students %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                        {{ student.first_name }} {{ student.last_name }}</h5>
+                <p><strong>Courses Enrolled:</strong></p>
+                {% if student.course_registrations.count == 0 %}
+                    <p>Not enrolled in any courses.</p>
+                {% else %}
+                <ul>
+                    {% for registration in student.course_registrations.all %}
+                        <li><a href="{% url 'course_detail' registration.course.id %}">{{ registration.course.title }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}

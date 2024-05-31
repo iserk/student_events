@@ -1,7 +1,11 @@
 {% extends "core/_base.html" %}
+
+{% load enrollment %}
+
 {% block title %}Courses{% endblock %}
 {% block header %}Courses{% endblock %}
 {% block content %}
+
     {% for course in courses %}
         <div class="card">
             <div class="card-body">
@@ -9,7 +13,33 @@
                     <a href="{% url 'course_detail' course.id %}">
                         {{ course.title }}</a></h5>
                 <p class="card-text">{{ course.description }}</p>
-                <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">View</a>
+
+                {% if not course.is_active %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+
+                {% if not course.is_public %}
+                    <span class="badge bg-warning" title="This course is not visible to the public">Private</span>
+                {% endif %}
+
+                {% if user|is_enrolled_to:course %}
+                    <span class="badge bg-primary">Enrolled</span>
+                {% else %}
+                    {% if user.is_authenticated and user|can_enroll_to:course %}
+                        <form action="{% url 'course_enroll' course.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Enroll</button>
+                        </form>
+                    {% else %}
+                        {% if course.seats_available <= 0 %}
+                            <span class="badge bg-danger">No Seats Available</span>
+                        {% endif %}
+                        {% if not user.is_authenticated %}
+                            <a href="{% url 'login' %}" class="btn btn-primary">Login to Enroll</a>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+
             </div>
         </div>
     {% endfor %}
