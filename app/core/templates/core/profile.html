@@ -58,4 +58,8 @@
   </tbody>
 </table>
 
+<form method="post" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit">logout</button>
+</form>
 {% endblock %}
