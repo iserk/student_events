@@ -1,10 +1,14 @@
 {% extends 'core/_base.html' %}
 {%  block header %}
-    Login
+{#    Login#}
 {% endblock %}
 
 {% block content %}
-    <form method="POST" action="{% url 'login' %}">
+    <div class="card user-login">
+        <div class="card-body">
+            <h3 class="card-title>">Login</h3>
+
+    <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-primary">Login</button>
@@ -19,4 +23,7 @@
 {#    {% endif %}#}
 
 {#    <p>Don't have an account? <a href="{% url 'signup' %}">Register</a></p>#}
+
+        </div>
+    </div>
 {% endblock %}

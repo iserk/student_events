@@ -1,7 +1,26 @@
 body {
+    /*max-width: 1000px;*/
+    margin: 0 auto;
+    /*padding: 0 10px;*/
+}
+
+
+.w-100 {
+    width: 100%;
+}
+
+.body_container {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 0 10px;
+}
+
+/*.navbar {*/
+/*    max-width: 1000px;*/
+/*    margin: 0 auto;*/
+/*}*/
+
+.content {
+    margin: 16px;
 }
 
 .card {
@@ -29,4 +48,25 @@ a,
 
 .page_header .delimiter {
     color: #888;
+}
+
+.errorlist {
+    padding: 0;
+    & li {
+        color: #d9534f;
+        background: #fee;
+        list-style-type: none;
+        border: 1px solid #d9534f;;
+        border-radius: 4px;
+        padding: 8px 16px;
+    }
+}
+
+.user-login {
+    max-width: 800px;
+    margin: 0 auto;
+    & label {
+        display: block;
+        margin: 8px 0;
+    }
 }
