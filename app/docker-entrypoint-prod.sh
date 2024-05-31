@@ -8,8 +8,11 @@ if [ "$DATABASE_ENGINE" = "postgres" ]; then echo "Waiting for postgres..."
     echo "PostgreSQL is accepting connections"
 fi
 
-echo "Apply database migrations"
+echo "Applying database migrations"
 python manage.py migrate
 
 echo "Starting server"
-/usr/local/bin/gunicorn sams.wsgi:application --workers 2 --bind :8000
+
+# Change the --forwarded-allow-ips parameter to the actual IP address of the reverse proxy server
+# or ensure that gunicorn is only accessible from the reverse proxy server
+/usr/local/bin/gunicorn sams.wsgi:application --workers 2 --forwarded-allow-ips="*" --bind :8000

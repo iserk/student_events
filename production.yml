@@ -5,6 +5,8 @@ services:
       context: ./app
       target: prod
     env_file: .env
+    environment:
+      DJANGO_DEBUG: 'false'
     expose:
       - "8000"
     depends_on:
@@ -20,9 +22,10 @@ services:
     restart: unless-stopped
     image: nginx:latest
     ports:
-      - "80:80"
+      - "${NGINX_HOST_PORT}:80"  # Use a TLS termination reverse proxy before it in production
     volumes:
       - "./nginx/default.conf:/etc/nginx/conf.d/default.conf"
+      - "./nginx/nginx.conf:/etc/nginx/nginx.conf"
       - app-static:/app/static
     links:
       - app:app
