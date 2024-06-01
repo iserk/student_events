@@ -7,7 +7,7 @@ from . import views, forms
 urlpatterns = [
     path("", views.home, name="home"),
 
-    path("request-info/", views.request_info, name="request_info"),
+    # path("request-info/", views.request_info, name="request_info"),
 
     path("courses/", views.show_course_list, name="course_list"),
     path("courses/<uuid:course_id>/", views.show_course_detail, name="course_detail"),

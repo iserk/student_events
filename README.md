@@ -110,13 +110,28 @@ to `your_domain_name.com:443` if you want to use HTTPS or `your_domain_name.com:
 
 Some other changes will be needed as well:
 - In `nginx/nginx.conf`, remove or comment out the following line:
-```Nginx
+  ```Nginx
     set_real_ip_from 0.0.0.0/0; # Trust all addresses (or specify your trusted IP ranges)
-```
-- In `nginx/default.conf`, update the `server_name` directive to your domain name:
-```Nginx
+  ```
+- In `nginx/default.conf`:
+  - update the `server_name` directive to your domain name:
+    ```Nginx
     server_name your_domain_name.com;
-```
+    ```
+  - uncomment the following lines:
+    ```Nginx
+    #        # Uncomment this section if this nginx server is NOT behind a reverse proxy
+    #         proxy_set_header X-Real-IP $remote_addr;
+    #         proxy_set_header X-Forwarded-Proto $scheme;
+    #         proxy_set_header X-Forwarded-Port $server_port;
+    ```
+  - comment out the following line:
+    ```Nginx
+        # Use this section if this nginx server is BEHIND a reverse proxy
+        proxy_set_header X-Real-IP $http_x_real_ip;
+        proxy_set_header X-Forwarded-Port $http_x_forwarded_port;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    ```
 
 ## 4. Running the project
 
