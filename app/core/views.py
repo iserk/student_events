@@ -59,6 +59,10 @@ def course_enroll(request, course_id):
         messages.error(request, f'The course "{course.title}" is not active.')
         return redirect('course_detail', course_id=course_id)
 
+    if not request.user.can_enroll_to(course):
+        messages.error(request, f'You are not allowed to enroll in the course "{course.title}".')
+        return redirect('course_detail', course_id=course_id)
+
     registration, created = models.CourseRegistration.objects.get_or_create(user=request.user, course=course)
     if created:
         messages.success(request, f'You have successfully enrolled in the course "{course.title}".')

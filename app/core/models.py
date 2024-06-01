@@ -11,7 +11,8 @@ User = get_user_model()
 User.add_to_class('is_student', lambda self: self.groups.filter(name='Students').exists())
 User.add_to_class('is_teacher', lambda self: self.groups.filter(name='Teachers').exists())
 User.add_to_class('is_enrolled_to', lambda self, course: course.registrations.filter(user=self).exists())
-User.add_to_class('can_enroll_to', lambda self, course: course.is_active and not self.is_enrolled_to(course) and course.seats_available() > 0)
+User.add_to_class('can_enroll_to', lambda self, course: course.is_active and not self.is_enrolled_to(course) \
+                                                        and (course.max_seats is None or course.seats_available()) > 0)
 
 
 class Course(models.Model):
