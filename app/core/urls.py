@@ -19,8 +19,6 @@ urlpatterns = [
     path("teacher/courses/<uuid:course_id>/", views.teacher_course_detail, name="teacher_course_detail"),
     path("teacher/courses/<uuid:course_id>/update/", views.teacher_course_update, name="teacher_course_update"),
 
-    # path('user/login/', views.user_login, name='login'),
-
     path(
         'user/login/',
         LoginView.as_view(
