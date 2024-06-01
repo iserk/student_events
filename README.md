@@ -15,12 +15,12 @@ It is a web application that allows teachers to manage their courses and student
 
 ## 2. Technologies
 - Python 3.12+
-- Django 5+
-- SQLite (for development)
-- PostgreSQL (for production)
+- Django 5
+- PostgreSQL
 - Bootstrap 5
 - Redis (for caching and session storage)
-- Nginx (for serving static files and reverse proxy)
+- Gunicorn (for production)
+- Nginx (for serving static files and reverse proxy in production)
 
 ## 3. Installation
 
@@ -29,9 +29,9 @@ First of all, clone the repository:
 git clone https://github.com/iserk/student_events.git
 ```
 
-### 3.1 Docker
+### 3.1 Docker Compose
 
-The project can be installed using Docker Compose (make sure you have Docker and Docker Compose installed on your system).
+The project can be installed using `Docker Compose` (make sure you have Docker installed on your system).
 
 Before starting the project, please update the environment variables in the `.env` file if needed.
 The most important environment variables are the following:
@@ -46,7 +46,6 @@ NGINX_HOST_PORT=127.0.0.1:8081
 ```
 
 #### 3.1.1 Development Environment
-Use the following command to start the project in development mode:
 You don't need to configure anything. Feel free to skip to the section 4.1.
 
 #### 3.1.2 Production Environment
@@ -56,6 +55,9 @@ which can also be used as a TLS termination point.
 In case you already have an Nginx server running on your server, this setup can use two instances of Nginx:
 - One is containerized and used for serving static files and reverse proxying to the Django application.
 - The other one is the existing Nginx server that will be used as a TLS termination point, reverse proxying to the containerized Nginx.
+
+
+##### 3.1.2.1 Using an external Nginx server for TLS termination (recommended)
 
 Below is an example configuration of an external Nginx server that will be used as a TLS termination point:
 
@@ -80,7 +82,8 @@ server {
 
         if (!-f $request_filename) {
             # Host and port of the containerized Nginx server.
-            # Change '127.0.0.1:8081' here to your host:port; must match the NGINX_HOST_PORT in the .env file:
+            # Change '127.0.0.1:8081' here to your host:port;
+            # must match the NGINX_HOST_PORT in the .env file:
             proxy_pass http://127.0.0.1:8081;
             break;
         }
@@ -98,6 +101,21 @@ server {
     server_name your_domain_name.com;
     return 301 https://your_domain_name.com$request_uri;
 }
+```
+
+##### 3.1.2.2 Using the provided Nginx container for TLS termination
+If you don't have an Nginx server running, you can use the provided Nginx container to serve static files and reverse proxy to the Django application.
+In this case, you will need to update the `NGINX_HOST_PORT` environment variable in the `.env` file
+to `your_domain_name.com:443` if you want to use HTTPS or `your_domain_name.com:80` if you want to use HTTP.
+
+Some other changes will be needed as well:
+- In `nginx/nginx.conf`, remove or comment out the following line:
+```Nginx
+    set_real_ip_from 0.0.0.0/0; # Trust all addresses (or specify your trusted IP ranges)
+```
+- In `nginx/default.conf`, update the `server_name` directive to your domain name:
+```Nginx
+    server_name your_domain_name.com;
 ```
 
 ## 4. Running the project
